@@ -24,3 +24,8 @@ class WrongCommandArgumentsException(message: String?) : CliException(message)
  * Exception that must be thrown if quoting in input is incorrect
  */
 class IncorrectQuotingException(message: String?) : CliException(message)
+
+/**
+ * Exception is thrown in cd or ls command, if didn't find that directory
+ */
+class NoSuchDirectoryException(message: String?) : CliException(message)

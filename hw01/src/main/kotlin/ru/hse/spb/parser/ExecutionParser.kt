@@ -27,6 +27,7 @@ object ExecutionParser: Parser {
                 throw UnknownCommandException("Unknown command: command is empty")
             }
             val arguments = command.subList(1, command.size)
+            val userDir = System.getProperty("user.dir")
             result = when (command[0]) {
                 "=" -> {
                     if (command.size != 3) {
@@ -34,10 +35,12 @@ object ExecutionParser: Parser {
                     }
                     Assignment(command[1], command[2], isSingleCommandInPipelineTokens, result)
                 }
-                "cat" -> Cat(arguments.map { s -> Paths.get(s) }, result)
+                "cat" -> Cat(arguments.map { s -> Paths.get(userDir, s) }, result)
                 "exit" -> Exit(isSingleCommandInPipelineTokens, result)
                 "pwd" -> Pwd(result)
-                "wc" -> Wc(arguments.map { s -> Paths.get(s) }, result)
+                "ls" -> Ls(arguments, result)
+                "cd" -> Cd(arguments, result)
+                "wc" -> Wc(arguments.map { s -> Paths.get(userDir, s) }, result)
                 "echo" -> Echo(command.subList(1, command.size), result)
                 "grep" -> {
                     val grepArgumentsParser = object : CliktCommand() {
