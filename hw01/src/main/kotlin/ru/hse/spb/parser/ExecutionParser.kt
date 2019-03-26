@@ -12,12 +12,21 @@ import com.github.ajalt.clikt.parameters.types.restrictTo
 import ru.hse.spb.exceptions.UnknownCommandException
 import ru.hse.spb.exceptions.WrongCommandArgumentsException
 import ru.hse.spb.execution.*
+import java.nio.file.Path
 import java.nio.file.Paths
 
 /**
  * Implementation of parser that supports pipeline and creates executables
  */
 object ExecutionParser: Parser {
+
+    private fun updatePath(userDir: String, passed: String): Path {
+        if (Paths.get(passed).isAbsolute) {
+            return Paths.get(passed)
+        }
+        return Paths.get(userDir, passed)
+    }
+
     override fun parse(tokens: List<String>): Executable {
         val partitionedTokens = partition(tokens)
         var result: Executable? = null
@@ -27,7 +36,7 @@ object ExecutionParser: Parser {
                 throw UnknownCommandException("Unknown command: command is empty")
             }
             val arguments = command.subList(1, command.size)
-            val userDir = System.getProperty("user.dir")
+            val userDir = System.getenv("PWD")
             result = when (command[0]) {
                 "=" -> {
                     if (command.size != 3) {
@@ -35,12 +44,12 @@ object ExecutionParser: Parser {
                     }
                     Assignment(command[1], command[2], isSingleCommandInPipelineTokens, result)
                 }
-                "cat" -> Cat(arguments.map { s -> Paths.get(userDir, s) }, result)
+                "cat" -> Cat(arguments.map { s -> updatePath(userDir, s) }, result)
                 "exit" -> Exit(isSingleCommandInPipelineTokens, result)
                 "pwd" -> Pwd(result)
                 "ls" -> Ls(arguments, result)
                 "cd" -> Cd(arguments, result)
-                "wc" -> Wc(arguments.map { s -> Paths.get(userDir, s) }, result)
+                "wc" -> Wc(arguments.map { s -> updatePath(userDir, s) }, result)
                 "echo" -> Echo(command.subList(1, command.size), result)
                 "grep" -> {
                     val grepArgumentsParser = object : CliktCommand() {
@@ -67,7 +76,7 @@ object ExecutionParser: Parser {
                     }
                     grepArgumentsParser.parse(arguments)
                     Grep(
-                        grepArgumentsParser.getRegexp(), grepArgumentsParser.file?.toPath(), result,
+                        grepArgumentsParser.getRegexp(), if (grepArgumentsParser.file?.toPath() == null) null else updatePath(userDir, grepArgumentsParser.file?.toPath().toString()).toAbsolutePath().normalize(), result,
                         grepArgumentsParser.linesToPrintAfter, grepArgumentsParser.wordRegexp
                     )
                 }

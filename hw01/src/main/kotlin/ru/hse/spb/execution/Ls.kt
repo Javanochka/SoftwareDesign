@@ -1,6 +1,7 @@
 package ru.hse.spb.execution
 
 import ru.hse.spb.exceptions.NoSuchDirectoryException
+import ru.hse.spb.execution.Utils.setenv
 import ru.hse.spb.pipeline.Pipeline
 import java.io.File
 import java.nio.file.Paths
@@ -13,14 +14,14 @@ import java.nio.file.Paths
 class Ls(arguments: List<String>, prev: Executable?) :
     OneTypeArgumentsExecutable<String>(arguments, prev) {
     override fun processArgumentsInput(): String {
-        val old = System.getProperty("user.dir")
-        val path = Paths.get(System.getProperty("user.dir"), arguments[0])
+        val old = System.getenv("PWD")
+        val path = Paths.get(old, arguments[0]).toAbsolutePath()
         if (!path.toFile().exists() || !path.toFile().isDirectory) {
             throw NoSuchDirectoryException(arguments[0])
         }
-        System.setProperty("user.dir", path.toAbsolutePath().toString())
+        setenv("PWD", path.toAbsolutePath().toString())
         val result = processEmptyInput()
-        System.setProperty("user.dir", old)
+        setenv("PWD", old)
         return result
     }
 
@@ -28,7 +29,7 @@ class Ls(arguments: List<String>, prev: Executable?) :
 
     override fun processEmptyInput(): String {
         var result = ""
-        File(System.getProperty("user.dir")).listFiles().forEach { result = result + it.name + " " + (if (it.isDirectory) "directory" else "file")+ "\n" }
+        File(System.getenv("PWD")).listFiles().forEach { result = result + it.name + " " + (if (it.isDirectory) "directory" else "file")+ "\n" }
         return result
     }
 

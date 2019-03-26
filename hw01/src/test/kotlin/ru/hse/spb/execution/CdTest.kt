@@ -2,6 +2,7 @@ package ru.hse.spb.execution
 
 import org.junit.Assert.*
 import org.junit.Test
+import ru.hse.spb.execution.Utils.setenv
 import java.io.File
 import java.nio.file.Paths
 
@@ -13,16 +14,16 @@ class CdTest {
         val old = Pwd(null).execute()
         Cd(listOf("src" + File.separator + "test" + File.separator + "resources"), null).execute()
         assertEquals(expected, Pwd(null).execute())
-        System.setProperty("user.dir", old)
+        setenv("PWD", old.trim())
     }
 
     @Test
     fun cdToOuterDirectory() {
-        val expected = Paths.get(Paths.get("").toAbsolutePath().toString(), "..").toAbsolutePath().toString() + "\n"
+        val expected = Paths.get(Paths.get("").toAbsolutePath().toString(), "..").toAbsolutePath().normalize().toString() + "\n"
         val old = Pwd(null).execute()
         Cd(listOf(".."), null).execute()
         assertEquals(expected, Pwd(null).execute())
-        System.setProperty("user.dir", old)
+        setenv("PWD", old.trim())
     }
 
     @Test
@@ -31,6 +32,6 @@ class CdTest {
         val old = Pwd(null).execute()
         Cd(listOf(), null).execute()
         assertEquals(expected, Pwd(null).execute())
-        System.setProperty("user.dir", old)
+        setenv("PWD", old.trim())
     }
 }

@@ -22,7 +22,7 @@ class ExternalCommand(private val commandName: String, arguments: List<String>, 
     override fun processPipelineInput(pipeLine: Pipeline) =
         runCommand(listOfNotNull(commandName, pipeLine.getContent()), getCurrentDir())
 
-    private fun getCurrentDir() = Paths.get("").toAbsolutePath().toFile()
+    private fun getCurrentDir() = Paths.get(System.getenv("PWD")).toFile()
 
     private fun runCommand(commandWithArguments: List<String>, workingDir: File): String {
         return try {

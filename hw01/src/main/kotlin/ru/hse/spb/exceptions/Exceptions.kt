@@ -28,4 +28,5 @@ class IncorrectQuotingException(message: String?) : CliException(message)
 /**
  * Exception is thrown in cd or ls command, if didn't find that directory
  */
-class NoSuchDirectoryException(message: String?) : CliException(message)
+class NoSuchDirectoryException(message: String?) :
+    CliException("No such directory: $message")

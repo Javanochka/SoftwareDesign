@@ -28,13 +28,13 @@ class ExecutionParserTest {
 
     @Test
     fun cat() {
-        testParsing<Cat>(listOf("cat", "example.txt"), Cat(listOf(Paths.get("example.txt")), null))
+        testParsing<Cat>(listOf("cat", "example.txt"), Cat(listOf(Paths.get(System.getenv("PWD"), "example.txt")), null))
     }
 
     @Test
     fun catPipeWc() {
         testParsing<Wc>(listOf("cat", "example.txt", "|", "wc"),
-            Wc(listOf(), Cat(listOf(Paths.get("example.txt")), null)))
+            Wc(listOf(), Cat(listOf(Paths.get(System.getenv("PWD"), "example.txt")), null)))
     }
 
     @Test
