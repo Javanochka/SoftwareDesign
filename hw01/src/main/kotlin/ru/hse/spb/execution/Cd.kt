@@ -1,11 +1,9 @@
 package ru.hse.spb.execution
 
 import ru.hse.spb.exceptions.NoSuchDirectoryException
-import ru.hse.spb.execution.Utils.setenv
+import ru.hse.spb.parser.ExecutionParser
 import ru.hse.spb.pipeline.Pipeline
 import java.nio.file.Paths
-import java.lang.reflect.AccessibleObject.setAccessible
-import java.util.*
 
 
 /**
@@ -18,16 +16,16 @@ class Cd(arguments: List<String>, prev: Executable?) :
     override fun processPipelineInput(pipeLine: Pipeline): String = processEmptyInput()
 
     override fun processEmptyInput(): String {
-        setenv("PWD", System.getProperty("user.home"))
+        ExecutionParser.userDir = System.getProperty("user.home")
         return ""
     }
 
     override fun processArgumentsInput(): String {
-        val path = Paths.get(System.getenv("PWD"), arguments[0]).toAbsolutePath().normalize()
+        val path = Paths.get(ExecutionParser.userDir, arguments[0]).toAbsolutePath().normalize()
         if (!path.toFile().exists() || !path.toFile().isDirectory) {
             throw NoSuchDirectoryException(arguments[0])
         }
-        setenv("PWD", path.toString())
+        ExecutionParser.userDir = path.toString()
         return ""
     }
 

@@ -20,6 +20,8 @@ import java.nio.file.Paths
  */
 object ExecutionParser: Parser {
 
+    var userDir : String = System.getProperty("user.dir")
+
     private fun updatePath(userDir: String, passed: String): Path {
         if (Paths.get(passed).isAbsolute) {
             return Paths.get(passed)
@@ -36,7 +38,6 @@ object ExecutionParser: Parser {
                 throw UnknownCommandException("Unknown command: command is empty")
             }
             val arguments = command.subList(1, command.size)
-            val userDir = System.getenv("PWD")
             result = when (command[0]) {
                 "=" -> {
                     if (command.size != 3) {

@@ -2,7 +2,7 @@ package ru.hse.spb.execution
 
 import org.junit.Assert.*
 import org.junit.Test
-import ru.hse.spb.execution.Utils.setenv
+import ru.hse.spb.parser.ExecutionParser
 import java.io.File
 import java.nio.file.Paths
 
@@ -14,7 +14,7 @@ class CdTest {
         val old = Pwd(null).execute()
         Cd(listOf("src" + File.separator + "test" + File.separator + "resources"), null).execute()
         assertEquals(expected, Pwd(null).execute())
-        setenv("PWD", old.trim())
+        ExecutionParser.userDir = old.trim()
     }
 
     @Test
@@ -23,7 +23,7 @@ class CdTest {
         val old = Pwd(null).execute()
         Cd(listOf(".."), null).execute()
         assertEquals(expected, Pwd(null).execute())
-        setenv("PWD", old.trim())
+        ExecutionParser.userDir = old.trim()
     }
 
     @Test
@@ -32,6 +32,6 @@ class CdTest {
         val old = Pwd(null).execute()
         Cd(listOf(), null).execute()
         assertEquals(expected, Pwd(null).execute())
-        setenv("PWD", old.trim())
+        ExecutionParser.userDir = old.trim()
     }
 }
