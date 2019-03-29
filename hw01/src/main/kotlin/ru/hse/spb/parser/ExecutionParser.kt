@@ -9,6 +9,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.restrictTo
+import ru.hse.spb.environment.GlobalEnvironment
 import ru.hse.spb.exceptions.UnknownCommandException
 import ru.hse.spb.exceptions.WrongCommandArgumentsException
 import ru.hse.spb.execution.*
@@ -19,8 +20,6 @@ import java.nio.file.Paths
  * Implementation of parser that supports pipeline and creates executables
  */
 object ExecutionParser: Parser {
-
-    var userDir : String = System.getProperty("user.dir")
 
     private fun updatePath(userDir: String, passed: String): Path {
         if (Paths.get(passed).isAbsolute) {
@@ -45,12 +44,12 @@ object ExecutionParser: Parser {
                     }
                     Assignment(command[1], command[2], isSingleCommandInPipelineTokens, result)
                 }
-                "cat" -> Cat(arguments.map { s -> updatePath(userDir, s) }, result)
+                "cat" -> Cat(arguments.map { s -> updatePath(GlobalEnvironment.userDir, s) }, result)
                 "exit" -> Exit(isSingleCommandInPipelineTokens, result)
                 "pwd" -> Pwd(result)
                 "ls" -> Ls(arguments, result)
                 "cd" -> Cd(arguments, result)
-                "wc" -> Wc(arguments.map { s -> updatePath(userDir, s) }, result)
+                "wc" -> Wc(arguments.map { s -> updatePath(GlobalEnvironment.userDir, s) }, result)
                 "echo" -> Echo(command.subList(1, command.size), result)
                 "grep" -> {
                     val grepArgumentsParser = object : CliktCommand() {
@@ -77,7 +76,7 @@ object ExecutionParser: Parser {
                     }
                     grepArgumentsParser.parse(arguments)
                     Grep(
-                        grepArgumentsParser.getRegexp(), if (grepArgumentsParser.file?.toPath() == null) null else updatePath(userDir, grepArgumentsParser.file?.toPath().toString()).toAbsolutePath().normalize(), result,
+                        grepArgumentsParser.getRegexp(), if (grepArgumentsParser.file?.toPath() == null) null else updatePath(GlobalEnvironment.userDir, grepArgumentsParser.file?.toPath().toString()).toAbsolutePath().normalize(), result,
                         grepArgumentsParser.linesToPrintAfter, grepArgumentsParser.wordRegexp
                     )
                 }

@@ -1,7 +1,7 @@
 package ru.hse.spb.execution
 
+import ru.hse.spb.environment.GlobalEnvironment
 import ru.hse.spb.exceptions.NoSuchDirectoryException
-import ru.hse.spb.parser.ExecutionParser
 import ru.hse.spb.pipeline.Pipeline
 import java.io.File
 import java.nio.file.Paths
@@ -14,14 +14,14 @@ import java.nio.file.Paths
 class Ls(arguments: List<String>, prev: Executable?) :
     OneTypeArgumentsExecutable<String>(arguments, prev) {
     override fun processArgumentsInput(): String {
-        val old = ExecutionParser.userDir
+        val old = GlobalEnvironment.userDir
         val path = Paths.get(old, arguments[0]).toAbsolutePath()
         if (!path.toFile().exists() || !path.toFile().isDirectory) {
             throw NoSuchDirectoryException(arguments[0])
         }
-        ExecutionParser.userDir = path.toAbsolutePath().toString()
+        GlobalEnvironment.userDir = path.toAbsolutePath().toString()
         val result = processEmptyInput()
-        ExecutionParser.userDir = old
+        GlobalEnvironment.userDir = old
         return result
     }
 
@@ -29,7 +29,7 @@ class Ls(arguments: List<String>, prev: Executable?) :
 
     override fun processEmptyInput(): String {
         var result = ""
-        File(ExecutionParser.userDir).listFiles().forEach { result = result + it.name + " " + (if (it.isDirectory) "directory" else "file")+ "\n" }
+        File(GlobalEnvironment.userDir).listFiles().forEach { result = result + it.name + " " + (if (it.isDirectory) "directory" else "file")+ "\n" }
         return result
     }
 

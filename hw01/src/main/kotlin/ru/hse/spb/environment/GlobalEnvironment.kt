@@ -5,6 +5,9 @@ package ru.hse.spb.environment
  * Only global variables are supported.
  */
 object GlobalEnvironment {
+
+    var userDir : String = System.getProperty("user.dir")
+
     private var variables = HashMap<String, String>()
 
     /**

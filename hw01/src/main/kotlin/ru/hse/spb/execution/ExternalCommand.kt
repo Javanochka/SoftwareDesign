@@ -1,5 +1,6 @@
 package ru.hse.spb.execution
 
+import ru.hse.spb.environment.GlobalEnvironment
 import ru.hse.spb.exceptions.ExternalCommandException
 import ru.hse.spb.pipeline.Pipeline
 import java.io.File
@@ -22,7 +23,7 @@ class ExternalCommand(private val commandName: String, arguments: List<String>, 
     override fun processPipelineInput(pipeLine: Pipeline) =
         runCommand(listOfNotNull(commandName, pipeLine.getContent()), getCurrentDir())
 
-    private fun getCurrentDir() = Paths.get(System.getenv("PWD")).toFile()
+    private fun getCurrentDir() = Paths.get(GlobalEnvironment.userDir).toFile()
 
     private fun runCommand(commandWithArguments: List<String>, workingDir: File): String {
         return try {
